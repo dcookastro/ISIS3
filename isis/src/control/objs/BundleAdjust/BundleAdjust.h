@@ -353,6 +353,9 @@ namespace Isis {
    *   @history 2018-11-29 Ken Edmundson - Modifed init, initializeNormalEquationsMatrix, and
    *                           computePartials methods.
    *   @history 2019-04-29 Ken Edmundson - Modifications for bundle with lidar.
+   *   @history 2019-07-17 Debbie A Cook - Fixed a problem with lidar data producing slightly
+   *                            different results on repeated runs with the same input parameters and data.
+   *                            See the init method. Fixes #3358.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT

@@ -412,6 +412,10 @@ namespace Isis {
    *                           a single measure on a point
    *   @history 2016-10-13 Ian Humphrey - Removed verification of held images in the from list
    *                           and counting of the number of held images. References #4293.
+   *   @history 2019-07-13 Debbie A. Cook - Fixed a bug that caused slight differences in the 
+   *                           results on repeated runs with the same input parameters and data. The 
+   *                           problem was fixed by loading lidar points from a sorted list version of 
+   *                           the lidar control point hash. Fixes #3358.
    *
    *   @todo remove printf statements
    *   @todo answer comments with questions, TODO, ???, and !!!
@@ -517,13 +521,18 @@ namespace Isis {
       point->ComputeApriori();
     }
 
-    // set up vector of BundleLidarControlPoints
+    // Set up vector of BundleLidarControlPoints
     int numLidarPoints = 0;
     if (m_lidarDataSet) {
       numLidarPoints = m_lidarDataSet->points().size();
     }
+    // Preload the sorted lidar point list (by point id) instead of loading directly from the hash
+    // to get a consistent point order in the output files and fix the problem with output data
+    // differing slightly on repeated runs with the same input parameters. (July 13, 2019)
+    QList< QSharedPointer<LidarControlPoint> > pointList = m_lidarDataSet->points(true);
+    
     for (int i = 0; i < numLidarPoints; i++) {
-      LidarControlPointQsp lidarPoint = m_lidarDataSet->points().at(i);
+      LidarControlPointQsp lidarPoint = pointList.at(i);
       if (lidarPoint->IsIgnored()) {
         continue;
       }
